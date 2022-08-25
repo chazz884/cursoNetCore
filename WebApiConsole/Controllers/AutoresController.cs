@@ -2,138 +2,145 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApiAutores.Controllers.Entidades;
 using Microsoft.EntityFrameworkCore;
-using WebApiAutores.Servicios;
 using Microsoft.AspNetCore.Authorization;
 using WebApiAutores.Filtros;
-// En el controlodaro se hacen los llamados o peticiones para el crud
+using WebApiAutores.DTOs;
+using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
+//Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNhcmxvc0Bob3RtYWlsLmNvbSIsImxvIHF1ZSB5byBxdWllcmEiOiJvdHJvIHZhbG9yIiwiZXNBZG1pbiI6IjEiLCJleHAiOjE2OTI5MTc2Njl9.wtnZr2nLiQoYVgbPl2dY7jOTd9f3dBmWZZxYlOjVbAQ
+
 namespace WebApiAutores.Controllers
 {
-    [ApiController]//Decorador con atributo que permite hacer validaciones automaticas
-    [Route("api/autores")]  // cuando se reemplaza la url con [controller] toma el nombre del controlodor p, esto es si en un futuro cambia es como una variable
-    // los decoradores son con []
-    // [Authorize] se protegen todas las peticiones a nivel de controlodor
+    [ApiController]
+    [Route("api/autores")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "EsAdmin")]
     public class AutoresController: ControllerBase
     {
         private readonly ApplicationDbContext context;
-        private readonly IServicio servicio;
-        private readonly ServicioTransient servicioTransient;
-        private readonly ServicioScope servicioScope;
-        private readonly ServicioSingleton servicioSingleton;
-        private readonly ILogger<AutoresController> logger;
+        private readonly IMapper mapper;
+        private readonly IAuthorizationService authorizationService;
+        // private readonly IConfiguration configuration;
 
-        public AutoresController(ApplicationDbContext context, IServicio servicio,
-            ServicioTransient servicioTransient, ServicioScope servicioScope, 
-            ServicioSingleton servicioSingleton, ILogger<AutoresController> logger){
+        public AutoresController(ApplicationDbContext context, IMapper mapper, IConfiguration configuration,
+        IAuthorizationService authorizationService){
             this.context = context;
-            this.servicio = servicio;
-            this.servicioTransient = servicioTransient;
-            this.servicioScope = servicioScope;
-            this.servicioSingleton = servicioSingleton;
-            this.logger = logger;
+            this.mapper = mapper;
+            this.authorizationService = authorizationService;
+            // this.configuration = configuration;
         }
+        // usando el appseting, apuntar a diferentes ambientes desde cs
+        // [HttpGet("configuraciones")]
+        // public ActionResult<string> ObtenerConfiguracion()
+        // {
+        //     return configuration["apellido"];
+        // }
 
-        [HttpGet("GUID")]
-        // Lo genial de ResponseCache es que la info de respuesta se almacena en caché durante x tiempo para que la siguiente peticion la consume de caché
-        // [ResponseCache(Duration = 10)]
-        [ServiceFilter(typeof(MiFiltroDeAccion))]
-        public ActionResult ObptenerGuids()
+        [HttpGet(Name = "obtenerAutores")] // api/autores => (la toma por defecto la ruta)
+        [AllowAnonymous]
+        [ServiceFilter(typeof(HATEOASAutorFilterAttribute))]
+        public async Task<ActionResult<List<AutorDTO>>> Get()
         {
-            return Ok(new {
-                AutoresController_Transient = servicioTransient.Guid,
-                ServicioA_Transient = servicio.ObtenerTransient(),
+            var autores = await context.Autores.ToListAsync();
+            return mapper.Map<List<AutorDTO>>(autores);
 
-                AutoresController_Scoped = servicioScope.Guid,
-                ServicioA_Scope = servicio.ObtenerScope(),
-                
-                AutoresController_Singleton = servicioSingleton.Guid,
-                ServicioA_Singleton = servicio.ObtenerSingleton()
-            });
-        }
+            // if (incluirHATEOAS)
+            // {
+            //     var esAdmin = await authorizationService.AuthorizeAsync(User, "esAdmin");
+            //     // dtos.ForEach(dto => GenerarEnlaces(dto, esAdmin.Succeeded));
 
-        // las rutas se pueden definir de la siguiente manera (aplica para todo el crud) y se pueden reemplazar con varibales para un end point específico
-        [HttpGet] // api/autores => (la toma por defecto la ruta)
-        [HttpGet("listado")] // api/autores/listado => (se agrega ruta específica)
-        [HttpGet("/listado")] // listado => (se reemplaza la base api/autores y se llama directamente listado)
-        // [Authorize]
-        [ServiceFilter(typeof(MiFiltroDeAccion))]
-        public async Task<ActionResult<List<Autor>>> Get()
-        {
-            throw new NotImplementedException();
-            logger.LogInformation("Obteniendo listado autores");
-            logger.LogWarning("Obteniendo listado autores test");
-            return await context.Autores.Include(x => x.Libros).ToListAsync();
-        }
+            //     var resultado = new ColeccionDeRecursos<AutorDTO> {Valores = dtos};
+            //     resultado.Enlaces.Add(
+            //         new DatoHATEOAS(
+            //             enlace: Url.Link("obtenerAutores",
+            //             new {}
+            //         ),
+            //         descripcion: "self",
+            //         metodo: "GET"
+            //     ));
+            //     if (esAdmin.Succeeded)
+            //     {
+            //         resultado.Enlaces.Add(
+            //             new DatoHATEOAS(
+            //                 enlace: Url.Link("crearAutor",
+            //                 new {}
+            //             ),
+            //             descripcion: "crear-autor",
+            //             metodo: "POST"
+            //         ));
+            //     }
 
-        [HttpGet("primero")]
-        public async Task<ActionResult<Autor>> PrimerAutor([FromHeader] int valor, [FromQuery] string nombre)
-        {
-            return await context.Autores.FirstOrDefaultAsync();
+            //     return Ok(resultado);
+            // }
+            // return Ok(dtos);
         }
 
         // ejemplo con una variable
-        [HttpGet("{id:int}/{param2}")]
-        public async Task<ActionResult<Autor>> Get(int id, string param2)
+        [HttpGet("{id:int}", Name = "obtenerAutor")]
+        [AllowAnonymous]
+        [ServiceFilter(typeof(HATEOASAutorFilterAttribute))]
+        public async Task<ActionResult<AutorDTOConLibros>> Get(int id)
         {
-            var autor =  await context.Autores.FirstOrDefaultAsync(x => x.Id == id);
+            // var autor =  await context.Autores.FirstOrDefaultAsync(autorBD => autorBD.Id == id);
+
+            var autor = await context.Autores
+            .Include(autorDB => autorDB.AutoresLibros)
+            .ThenInclude(autorLibroDB => autorLibroDB.Libro)
+            .FirstOrDefaultAsync(autorBD => autorBD.Id == id);
 
             if (autor == null)
             {
                 return NotFound();
             }
 
-            return autor;
-        }
-        [HttpGet("{nombre}")]
-        public async Task<ActionResult<Autor>> Get([FromRoute] string nombre)
-        {
-            var autor =  await context.Autores.FirstOrDefaultAsync(x => x.Nombre == nombre);
+            var dto = mapper.Map<AutorDTOConLibros>(autor);
 
-            if (autor == null)
-            {
-                return NotFound();
-            }
-
-            return autor;
+            return dto;
         }
-        // puede funcionar con llamados sincronos el async se usa si consumimos apis externos  casi siempre
-        [HttpGet("sincrona")]
-        public List<Autor> GetSincrona()
+        [HttpGet("{nombre}", Name = "obtenerAutorPorNombre")]
+        public async Task<ActionResult<List<AutorDTO>>> GetPorNombre([FromRoute] string nombre)
         {
-            return context.Autores.Include(x => x.Libros).ToList();
+            var autores =  await context.Autores.Where(autorBD => autorBD.Nombre.Contains(nombre)).ToListAsync();
+
+            return mapper.Map<List<AutorDTO>>(autores);
         }
 // ------------------------------------
-        [HttpPost]
-        public async Task<ActionResult> Post([FromBody] Autor autor){
-            var existeAutorMismoNombre = await context.Autores.AnyAsync(x => x.Nombre == autor.Nombre);
+        [HttpPost(Name = "crearAutor")]
+        public async Task<ActionResult> Post([FromBody] AutorCreacionDTO autorCreacionDTO){
+            var existeAutorMismoNombre = await context.Autores.AnyAsync(x => x.Nombre == autorCreacionDTO.Nombre);
             if (existeAutorMismoNombre)
             {
-                return BadRequest($"Ya existe el mismo autor con el mismo nombre {autor.Nombre}");
+                return BadRequest($"Ya existe el mismo autor con el mismo nombre {autorCreacionDTO.Nombre}");
             }
+            
+            var autor = mapper.Map<Autor>(autorCreacionDTO);
+
             context.Add(autor);
             await context.SaveChangesAsync();
-            return Ok();
+            
+            // Para buenas practicas se retorna donde se encuentra la data :: 
+            var autorDTO = mapper.Map<AutorDTO>(autor);
+            return CreatedAtRoute("obtenerAutor", new {id = autor.Id}, autorDTO);
         }
 
-        [HttpPut("{id:int}")]// [HttpPut("{id:int}")] se establece o complementa la ruta definida arriba api/autores/id 
-        public async Task<ActionResult> Put(Autor autor, int id)
+        [HttpPut("{id:int}",Name = "actualizarAutor")]// [HttpPut("{id:int}")] se establece o complementa la ruta definida arriba api/autores/id 
+        public async Task<ActionResult> Put(AutorCreacionDTO autorCreacionDTO, int id)
         {
-            if (autor.Id != id)
-            {
-                return BadRequest("El id del autor no coincide con el id de url");                
-            }
-
             var existe = await context.Autores.AnyAsync( x => x.Id == id); // Valida si exiaste el id
             if (!existe)
             {
                 return NotFound();                
             }
+            
+            var autor = mapper.Map<Autor>(autorCreacionDTO);
+            autor.Id = id;
 
             context.Update(autor);
             await context.SaveChangesAsync();
-            return Ok();
+            return NoContent();
         }
 
-        [HttpDelete("{id:int}")]// [HttpDelete("{id:int}")] se establece o complementa la ruta definida arriba api/autores/id 
+        [HttpDelete("{id:int}", Name = "borrarAutor")]// [HttpDelete("{id:int}")] se establece o complementa la ruta definida arriba api/autores/id 
         public async Task<ActionResult> Delete(int id)
         {
             var existe = await context.Autores.AnyAsync( x => x.Id == id); // Valida si exiaste el id

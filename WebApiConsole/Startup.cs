@@ -1,10 +1,17 @@
 ﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using WebApiAutores.Filtros;
 using WebApiAutores.Middlewares;
 using WebApiAutores.Servicios;
+using WebApiAutores.Utilidades;
 
 namespace WebApiAutores
 {
@@ -12,6 +19,7 @@ namespace WebApiAutores
     {
         public Startup(IConfiguration configuration )
         {
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             Configuration = configuration;
         }
 
@@ -24,57 +32,96 @@ namespace WebApiAutores
             {
                 opciones.Filters.Add(typeof(FiltroDeExcepcion));
             }).AddJsonOptions(x => 
-                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles
-            );
+                x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles).AddNewtonsoftJson();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("defaultConnection")));
-            
-            // se puede injectar la interfaz e instanciar la clase
-            // services.AddTransient<ServicioA>(); se puede injectar la clase de la interfaz directamente 
-            // AddScope = cambia la instancia
-            // AddSingleton = se usa siempre la misma instancia
-            services.AddTransient<IServicio,  ServicioA>(); 
 
-            services.AddTransient<ServicioTransient>(); 
-            services.AddScoped<ServicioScope>(); 
-            services.AddSingleton<ServicioSingleton>(); 
-
-            services.AddHostedService<EscribirEnArchivo>();
-            services.AddTransient<MiFiltroDeAccion>();
-
-            services.AddResponseCaching();
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opciones =>
+                opciones.TokenValidationParameters = new TokenValidationParameters{
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(Configuration["llavejwt"])
+                    ),
+                    ClockSkew = TimeSpan.Zero
+                }
+            );
 
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(c => c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "WebAPIAutores", Version = "v1"}));
+            services.AddSwaggerGen(c => {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "WebAPIAutores", Version = "v1"});
+                c.OperationFilter<AgregarParametroHATEOAS>();
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header
+                });
+                
+                c.AddSecurityRequirement( new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[]{}
+                    }
+                });
+            });
+
+            services.AddAutoMapper(typeof(Startup));
+
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            services.AddAuthorization(opciones => 
+            {
+                opciones.AddPolicy("EsAdmin", politica => politica.RequireClaim("esAdmin"));
+            });
+
+            // Agregando extension para usar encriptado
+            services.AddDataProtection();
+            services.AddTransient<HashService>();
+
+            services.AddCors(opciones =>
+            {
+                opciones.AddDefaultPolicy(builder =>
+                {
+                    builder.WithOrigins("https://www.apirequest.io").AllowAnyMethod().AllowAnyHeader();
+                });
+            });
+
+            services.AddTransient<GeneradorEnlaces>();
+            services.AddTransient<HATEOASAutorFilterAttribute>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
         }
         // Configure se usan los middleweare
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
-            // app.UseMiddleware<LoguearRespuestaHTTPMiddleware>(); Se expone directamente  la clase quee usamos para el middleware
             app.UseLoguearRespuestaHTTP(); 
-            // Tubería con ruta especific para que no interfiera con las demas
-            app.Map("/ruta1", app =>
-            {
-                app.Run(async contexto => {
-                    await contexto.Response.WriteAsync("Estoy en la tubería de primeras");
-                });   
-            });
 
             if (env.IsDevelopment())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebAPIAutores v1"));
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            app.UseResponseCaching();
+            app.UseCors();
 
             app.UseAuthorization();
 

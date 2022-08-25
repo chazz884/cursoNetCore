@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "QDFOM1xkZ3DJaFZrQWORhtKEgWYmNsUL+jbF7tdOMaQ=",
+  "Hash": "qenTLI4piO+p0NioU3WkmIYhYnI1Wc4nMs57kahG8po=",
   "Source": "WebApiConsole",
   "BasePath": "_content/WebApiConsole",
   "Mode": "Default",
@@ -10,17 +10,17 @@
     {
       "Name": "WebApiConsole/wwwroot",
       "Source": "WebApiConsole",
-      "ContentRoot": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/wwwroot/",
+      "ContentRoot": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/wwwroot/",
       "BasePath": "_content/WebApiConsole",
       "Pattern": "**"
     }
   ],
   "Assets": [
     {
-      "Identity": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/wwwroot/Archivo 1.txt",
+      "Identity": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/wwwroot/Archivo 1.txt",
       "SourceId": "WebApiConsole",
       "SourceType": "Discovered",
-      "ContentRoot": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/wwwroot/",
+      "ContentRoot": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/wwwroot/",
       "BasePath": "_content/WebApiConsole",
       "RelativePath": "Archivo 1.txt",
       "AssetKind": "All",
