@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj": {}
+    "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj": {}
   },
   "projects": {
-    "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj": {
+    "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj",
+        "projectUniqueName": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj",
         "projectName": "WebApiConsole",
-        "projectPath": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj",
+        "projectPath": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj",
         "packagesPath": "/Users/carlossanabria/.nuget/packages/",
-        "outputPath": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/obj/",
+        "outputPath": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/carlossanabria/.nuget/NuGet/NuGet.Config"
@@ -38,10 +38,6 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
-              "target": "Package",
-              "version": "[11.0.0, )"
-            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.8, )"

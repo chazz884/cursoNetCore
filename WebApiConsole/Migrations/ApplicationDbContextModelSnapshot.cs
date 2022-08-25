@@ -31,54 +31,13 @@ namespace WebApiConsole.Migrations
 
                     b.Property<string>("Nombre")
                         .IsRequired()
-                        .HasMaxLength(115)
-                        .HasColumnType("nvarchar(115)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Autores");
                 });
 
-            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.AutorLibro", b =>
-                {
-                    b.Property<int>("AutorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LibroId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Orden")
-                        .HasColumnType("int");
-
-                    b.HasKey("AutorId", "LibroId");
-
-                    b.HasIndex("LibroId")
-                        .IsUnique();
-
-                    b.ToTable("AutoresLibros");
-                });
-
-            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Comentario", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Contenido")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("LibroId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LibroId");
-
-                    b.ToTable("Comentarios");
-                });
-
             modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Libro", b =>
                 {
                     b.Property<int>("Id")
@@ -87,56 +46,34 @@ namespace WebApiConsole.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AutorId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Titulo")
                         .IsRequired()
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AutorId");
 
                     b.ToTable("Libros");
                 });
 
-            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.AutorLibro", b =>
+            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Libro", b =>
                 {
                     b.HasOne("WebApiAutores.Controllers.Entidades.Autor", "Autor")
-                        .WithMany("AutorLibro")
+                        .WithMany("Libros")
                         .HasForeignKey("AutorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WebApiAutores.Controllers.Entidades.Libro", "Libro")
-                        .WithOne("AutorLibro")
-                        .HasForeignKey("WebApiAutores.Controllers.Entidades.AutorLibro", "LibroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Autor");
-
-                    b.Navigation("Libro");
-                });
-
-            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Comentario", b =>
-                {
-                    b.HasOne("WebApiAutores.Controllers.Entidades.Libro", "Libro")
-                        .WithMany("Comentarios")
-                        .HasForeignKey("LibroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Libro");
                 });
 
             modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Autor", b =>
                 {
-                    b.Navigation("AutorLibro");
-                });
-
-            modelBuilder.Entity("WebApiAutores.Controllers.Entidades.Libro", b =>
-                {
-                    b.Navigation("AutorLibro");
-
-                    b.Navigation("Comentarios");
+                    b.Navigation("Libros");
                 });
 #pragma warning restore 612, 618
         }

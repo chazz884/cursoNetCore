@@ -1,14 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "JgK7/2vnMdSqrfjHRpZITvUq4V58JkfauYUd0FPU0MeczaOSGlJjtdxqbTdjmLPbkIIgzDWXhfNppqEKgHkQ2A==",
+  "dgSpecHash": "Q2CAUic1zJ+UEBX3aqvkQzsycFqi2I3FXzCtuQHpR6kU1pL0aqXSbVpnPGOz1+jiHzXVY9/uj+hEtB5SZfnwjg==",
   "success": true,
-  "projectFilePath": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj",
+  "projectFilePath": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj",
   "expectedPackageFiles": [
-    "/Users/carlossanabria/.nuget/packages/automapper/11.0.0/automapper.11.0.0.nupkg.sha512",
-    "/Users/carlossanabria/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/11.0.0/automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/humanizer.core/2.8.26/humanizer.core.2.8.26.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/6.0.8/microsoft.aspnetcore.authentication.jwtbearer.6.0.8.nupkg.sha512",
-    "/Users/carlossanabria/.nuget/packages/microsoft.csharp/4.7.0/microsoft.csharp.4.7.0.nupkg.sha512",
+    "/Users/carlossanabria/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/microsoft.data.sqlclient/2.1.4/microsoft.data.sqlclient.2.1.4.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/microsoft.data.sqlclient.sni.runtime/2.1.1/microsoft.data.sqlclient.sni.runtime.2.1.1.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/microsoft.entityframeworkcore/6.0.8/microsoft.entityframeworkcore.6.0.8.nupkg.sha512",
