@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "x1sDYdAyUiXwYwGfbTaKgxl+PIfyNbJpqL2yC39dh4elef7LHzc4bZiiYNMF3jN3QIUBv3F30yNhektwxr9xcQ==",
+  "dgSpecHash": "H5Nclh/pOy0gvml39RdAOPI9N6KFVj+gvbk2Gzo/CTTImUcdVkYgf0Mf6GAJ9rcvo7HWWe9eJiWdOLjw8cCe8g==",
   "success": true,
-  "projectFilePath": "/Users/carlossanabria/Documents/cursos/NetCore/WebApiConsole/WebApiConsole.csproj",
+  "projectFilePath": "/Users/carlossanabria/Documents/GIT/cursoNetCore/WebApiConsole/WebApiConsole.csproj",
   "expectedPackageFiles": [
     "/Users/carlossanabria/.nuget/packages/automapper/11.0.0/automapper.11.0.0.nupkg.sha512",
     "/Users/carlossanabria/.nuget/packages/automapper.extensions.microsoft.dependencyinjection/11.0.0/automapper.extensions.microsoft.dependencyinjection.11.0.0.nupkg.sha512",

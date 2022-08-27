@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebApiConsole</name>
+    </assembly>
+    <members>
+        <member name="M:WebApiAutores.Controllers.V1.AutoresController.Delete(System.Int32)">
+            <summary>
+            Borrar autor
+            </summary>
+            <param name="id">Id del autor para borrar</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

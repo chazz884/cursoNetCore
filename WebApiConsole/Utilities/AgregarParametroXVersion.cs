@@ -4,14 +4,14 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace WebApiAutores.Utilidades
 {
-    public class AgregarParametroHATEOAS: IOperationFilter
+    public class AgregarParametroXVersion : IOperationFilter
     {
+        public AgregarParametroXVersion()
+        {
+        }
+
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            if (context.ApiDescription.HttpMethod != "GET")
-            {
-                return;
-            }
             if (operation.Parameters == null)
             {
                 operation.Parameters = new List<OpenApiParameter>();
@@ -19,9 +19,9 @@ namespace WebApiAutores.Utilidades
 
             operation.Parameters.Add(new OpenApiParameter
             {
-                Name = "incluirHATEOAS",
+                Name = "x-version",
                 In = ParameterLocation.Header,
-                Required = false
+                Required = true
             });
         }
     }
